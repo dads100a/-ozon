@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>{{ product[1] }}</title>
+<style>
+/* ваши стили ... (оставьте как есть или добавьте свои) */
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #121212;
+  margin: 0;
+  padding: 20px;
+  color: #eee;
+}
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+h2 {
+  text-align: center;
+  font-size: 2.5em;
+  margin-bottom: 20px;
+  color: #fff;
+}
+.product-card {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  background: #1e1e1e;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+.product-image {
+  flex: 1;
+  max-width: 500px;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
+}
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+#productName {
+  font-size: 2em;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #fff;
+}
+#price {
+  font-size: 2em;
+  font-weight: 700;
+  color: #27ae60;
+  margin-bottom: 10px;
+}
+#stock {
+  font-size: 1.2em;
+  color: #e74c3c;
+  margin-bottom: 20px;
+}
+.buttons {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.btn {
+  padding: 12px 24px;
+  background-color: #2980b9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.btn:hover {
+  background-color: #3498db;
+}
+.section {
+  display: none;
+  background: #2c2c2c;
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1200px;
+  margin: 20px auto;
+}
+.section.active {
+  display: block;
+}
+#reviewsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#writeReviewBtn {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 12px 25px;
+  background-color: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#writeReviewBtn:hover {
+  background-color: #2ecc71;
+}
+#addReviewForm {
+  display: none;
+  margin-top: 20px;
+  flex-direction: column;
+  gap: 15px;
+}
+#addReviewForm input, #addReviewForm textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #444;
+  color: #fff;
+  font-size: 1em;
+  width: 100%;
+}
+#starRating {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+.star-select {
+  font-size: 24px;
+  cursor: pointer;
+  color: gray;
+  transition: color 0.2s;
+}
+.star-select.filled {
+  color: #f39c12; /* желтая звезда */
+}
+#submitReview {
+  padding: 12px 25px;
+  background-color: #2980b9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+}
+#submitReview:hover {
+  background-color: #3498db;
+}
+#shareBtn {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 24px;
+  background-color: #8e44ad;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#shareBtn:hover {
+  background-color: #9b59b6;
+}
+#bottomOrderBtn {
+  display: block;
+  width: 100%;
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: #2980b9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+#bottomOrderBtn:hover {
+  background-color: #3498db;
+}
+#orderSection {
+  display: none;
+  margin-top: 20px;
+}
+#orderSection.show {
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<h2>{{ product[1] }}</h2>
+
+<!-- Карточка товара -->
+<div class="product-card" data-id="{{ product[0] }}" data-stock="{{ stock }}">
+  <img src="{{ product[4] }}" alt="{{ product[1] }}" class="product-image" />
+  <div class="product-info">
+    <div id="productName">{{ product[1] }}</div>
+    <div id="price">{{ product[3] }} руб.</div>
+    <!-- Убрали отзывы -->
+    <div id="stock" class="product-stock">Осталось: <span id="stockCount">{{ stock }}</span> шт.</div>
+    <div class="buttons">
+      <button class="btn" onclick="showSection('description')">Описание</button>
+    </div>
+  </div>
+</div>
+
+<!-- Поделиться -->
+<button id="shareBtn" onclick="shareLink()">Поделиться ссылкой</button>
+
+<!-- Разделы: описание и отзывы -->
+<div id="description" class="section active">
+  <h3>Описание</h3>
+  <p>{{ description }}</p>
+</div>
+<button onclick="toggleReviews()">Отзывы</button>
+<div id="reviews" class="section" style="display:none;">
+  <h3>Отзывы</h3>
+  <div id="reviewsContainer"></div>
+  <button id="writeReviewBtn" onclick="showAddReview()">Написать отзыв</button>
+  
+  <!-- Форма оставить отзыв -->
+  <div id="addReviewForm" style="display:none; flex-direction:column; gap:10px; margin-top:10px;">
+    <input type="text" id="reviewerName" placeholder="Ваше имя" required>
+    <textarea id="reviewText" rows="4" placeholder="Ваш отзыв" required></textarea>
+    
+    <!-- Звезды для оценки -->
+    <div id="starRating" style="font-size:24px; cursor:pointer;">
+      <span class="star-select" data-star="1">&#9733;</span>
+      <span class="star-select" data-star="2">&#9733;</span>
+      <span class="star-select" data-star="3">&#9733;</span>
+      <span class="star-select" data-star="4">&#9733;</span>
+      <span class="star-select" data-star="5">&#9733;</span>
+    </div>
+    
+    <button id="submitReview">Отправить отзыв</button>
+  </div>
+</div>
+
+<!-- ВНИЗЕ: синяя кнопка "Заказать" -->
+<button id="bottomOrderBtn" onclick="showOrderWindow()">Заказать (срок: {{ delivery_time }})</button>
+
+<!-- окно выбора количества -->
+<div id="orderSection">
+  <div style="background:#2c2c2c; padding:20px; border-radius:10px; display:inline-block;">
+    <h3>Выберите количество</h3>
+    <p>Доступно: <span id="maxQty"></span></p>
+    <input type="number" id="orderQtyInput" min="1" value="1" style="width:80px; padding:10px; font-size:1em;">
+    <p>Общая цена: <span id="totalPrice"></span> руб.</p>
+    <button class="btn" onclick="confirmOrder()">Заказать</button>
+    <button class="btn" onclick="hideOrderWindow()">Отмена</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+// Переменные
+const productId={{ product[0] }};
+let currentStock={{ stock }};
+const userBalance = parseFloat("{{ user_balance }}");
+let productPrice={{ product[3] }};
+
+// Показать окно заказа
+function showOrderWindow() {
+  document.getElementById('orderSection').style.display='block';
+  document.getElementById('maxQty').innerText=currentStock;
+  document.getElementById('orderQtyInput').value=1;
+  document.getElementById('orderQtyInput').max=currentStock;
+  updateTotalPrice();
+}
+
+// Скрыть окно заказа
+function hideOrderWindow() {
+  document.getElementById('orderSection').style.display='none';
+}
+
+// Обновление общей цены
+function updateTotalPrice() {
+  const qty=parseInt(document.getElementById('orderQtyInput').value);
+  if(isNaN(qty) || qty<1) {
+    document.getElementById('orderQtyInput').value=1;
+    return;
+  }
+  if(qty>currentStock) {
+    document.getElementById('orderQtyInput').value=currentStock;
+    return;
+  }
+  const total=(qty*productPrice).toFixed(2);
+  document.getElementById('totalPrice').innerText=total;
+}
+
+// Обработка изменения количества
+document.getElementById('orderQtyInput').addEventListener('input', ()=> {
+  let val=parseInt(document.getElementById('orderQtyInput').value);
+  if(isNaN(val) || val<1) val=1;
+  if(val>currentStock) val=currentStock;
+  document.getElementById('orderQtyInput').value=val;
+  updateTotalPrice();
+});
+
+// Подтверждение заказа
+function confirmOrder() {
+  const qty=parseInt(document.getElementById('orderQtyInput').value);
+  const total=(qty*productPrice).toFixed(2);
+  if(parseFloat(total) > userBalance){
+    alert('Недостаточно денег');
+    return;
+  }
+  if(qty > currentStock){
+    alert('Недостаточно товара');
+    return;
+  }
+  if(confirm(`Заказать ${qty} шт. на ${total} руб.?`)){
+    // Передача quantity в API
+    fetch('/api/order/' + productId, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({quantity: qty})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.status==='ok'){
+        alert('Заказ успешно оформлен!\nОстаток: ' + (currentStock - qty) + ' шт.\nВаш баланс: ' + data.new_balance);
+        currentStock -= qty;
+        document.querySelector('.product-stock span#stockCount').innerText=currentStock;
+        // Можно обновить баланс или перезагрузить
+        // location.reload();
+      } else {
+        alert('Ошибка: ' + data.message);
+      }
+    });
+    hideOrderWindow();
+  }
+}
+
+function toggleReviews() {
+  const section = document.getElementById('reviews');
+  if (section.style.display === 'none' || section.style.display === '') {
+    section.style.display = 'block';
+  } else {
+    section.style.display = 'none';
+  }
+}
+
+
+function updateStars() {
+  document.querySelectorAll('.star-select').forEach(star => {
+    if (parseInt(star.dataset.star) <= selectedStar) {
+      star.classList.add('filled');
+    } else {
+      star.classList.remove('filled');
+    }
+  });
+}
+
+document.getElementById('submitReview').addEventListener('click', () => {
+  const name = document.getElementById('reviewerName').value.trim();
+  const text = document.getElementById('reviewText').value.trim();
+  const stars = selectedStar;
+
+  if (!name || !text || stars === 0) {
+    alert('Пожалуйста, заполните все поля и поставьте оценку.');
+    return;
+  }
+
+  // Отправка на сервер
+  fetch(`/api/add_review/{{ product[0] }}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, text, stars })
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.status === 'ok') {
+      alert('Отзыв успешно добавлен');
+      // Можно обновить список отзывов или скрыть форму
+    } else {
+      alert('Ошибка: ' + data.message);
+    }
+  });
+});
+
+// Обработчик кнопки "Заказать"
+document.getElementById('bottomOrderBtn').onclick=()=>showOrderWindow();
+
+</script>
+</body>
+</html>

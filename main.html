@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Главная</title>
+<style>
+/* Общие стили (оставьте или добавьте свои) */
+body {
+    background-color: #121212;
+    color: #eee;
+    font-family: Arial, sans-serif;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #1e1e1e;
+    border-bottom: 1px solid #333;
+}
+.balance {
+    font-size: 1em;
+}
+.btn-small {
+    padding: 5px 10px;
+    background-color: #2980b9;
+    color: #fff;
+    border-radius: 4px;
+    text-decoration: none;
+    margin-left: 10px;
+}
+h2 {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 2em;
+}
+#search {
+    display: block;
+    margin: 15px auto;
+    padding: 10px;
+    width: 200px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #2c2c2c;
+    color: #fff;
+}
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+.product-card {
+    background-color: #1e1e1e;
+    border-radius: 15px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: box-shadow 0.3s;
+    position: relative; /* для позиционирования кнопки редактировать */
+}
+.product-card:hover {
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.product-image img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+.product-price {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+.product-stock {
+    color: #e74c3c;
+    font-size: 0.8em;
+    margin-top: 5px;
+}
+.product-name {
+    font-size: 1.1em;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+.card-footer {
+    background-color: #007bff;
+    border-radius: 15px;
+    padding: 10px;
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+    font-size: 1em;
+    width: 100%;
+}
+.card-footer:hover {
+    background-color: #0069d9;
+}
+.delivery-time {
+    font-size: 0.8em;
+    color: #007bff;
+    margin-top: 5px;
+    text-align: center;
+}
+/* Меню баланса */
+#balanceMenu {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+#balanceMenu h3 {
+    margin-top: 0;
+}
+#balanceMenu input {
+    padding: 10px;
+    width: 200px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #444;
+    color: #fff;
+}
+#balanceMenu button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #2980b9;
+    color: #fff;
+    cursor: pointer;
+}
+#balanceMenu button:hover {
+    background-color: #3498db;
+}
+/* Меню админа */
+#adminMenu {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #2c2c2c;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+#adminMenu h3 {
+    margin-top: 0;
+}
+#adminMenu input {
+    padding: 10px;
+    width: 200px;
+    margin-top: 10px;
+    border-radius: 5px;
+    border: 1px solid #555;
+    background-color: #444;
+    color: #fff;
+}
+#adminMenu button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #2980b9;
+    color: #fff;
+    cursor: pointer;
+}
+#adminMenu button:hover {
+    background-color: #3498db;
+}
+
+/* Новые разделы для заказов */
+#producersSection, #receivedSection {
+    display: none;
+    margin: 20px;
+}
+</style>
+</head>
+<body>
+<div class="header">
+    <!-- текущие элементы -->
+    <div class="balance">
+        Баланс: <span id="userBalance">{{ user[5] }}</span> руб.
+        <button class="btn-small" onclick="openBalanceMenu()">Вывод средств</button>
+        <button class="btn-small" onclick="openAdminMenu()">Admin</button>
+        <!-- новые кнопки -->
+        <a href="{{ url_for('seller_orders') }}">Мои продажи</a>
+        <a href="my-deliveries">Мои доставленные товары</a>
+        <a href="{{ url_for('withdraw') }}">Вывод средств</a>
+        <a href="/new_product" style="margin-right:10px; background-color:#2980b9; color:#fff; padding:10px 15px; border-radius:8px; text-decoration:none;">Создать товар</a>
+    </div>
+</div>
+
+<h2>Товары</h2>
+<input type="text" placeholder="Поиск..." id="search" onkeyup="filterProducts()" />
+
+<div class="products-grid" id="products">
+    {% for product in products %}
+    <div class="product-card" data-id="{{ product[0] }}" data-stock="{{ product[5] }}">
+        <!-- Кнопка редактирования -->
+        <div class="edit-btn" style="position:absolute; top:5px; right:5px; cursor:pointer; background:#000; padding:2px 5px; border-radius:3px;"
+             onclick="window.location.href='/edit_product/{{ product[0] }}'">Редактировать</div>
+        <div class="product-image">
+            <img src="{{ product[4] }}" alt="{{ product[1] }}">
+        </div>
+        <div class="product-price">₽ {{ product[3] }}</div>
+        <div class="product-stock">Остаток: <span class="stock-count">{{ product[5] }}</span> шт.</div>
+        <div class="product-name">{{ product[1] }}</div>
+        <div class="card-footer" onclick="window.location.href='/product/{{ product[0] }}'">Подробнее</div>
+        <div class="delivery-time">сроки доставки: 3-5 дней</div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Меню вывода средств -->
+<div id="balanceMenu">
+    <h3>Ваш баланс: <span id="balanceAmount">{{ user[5] }}</span> руб.</h3>
+    <p>Введите сумму для вывода:</p>
+    <input type="number" id="withdrawAmount" placeholder="Сумма" min="1" />
+    <button onclick="confirmWithdraw()">Подтвердить</button>
+    <button onclick="closeBalanceMenu()">Закрыть</button>
+</div>
+
+<!-- Меню админа -->
+<div id="adminMenu">
+    <h3>Введите пароль</h3>
+    <input type="password" id="adminPassword" />
+    <button onclick="checkAdminPassword()">Войти</button>
+    <button onclick="closeAdminMenu()">Отмена</button>
+    <div id="adminActions" style="display:none; margin-top:10px;">
+        <h4>Пополнить средства</h4>
+        <input type="number" id="adminAmount" placeholder="Сумма" min="1" />
+        <input type="text" id="adminAccountId" placeholder="ID аккаунта" />
+        <button onclick="adminAddFunds()">Пополнить</button>
+    </div>
+</div>
+
+<!-- Разделы для заказов -->
+<div id="producersSection">
+    <h2>Ваши заказы на продажу</h2>
+    <div id="producersOrders"></div>
+</div>
+<div id="receivedSection">
+    <h2>Пришедшие товары</h2>
+    <div id="receivedOrders"></div>
+</div>
+
+<button onclick="showMyProducts()">Мои товары</button>
+<div id="myProducts" style="display:none;">
+  <h2>Мои товары</h2>
+  <div id="myProductsList"></div>
+</div>
+<a href="{{ url_for('my_products') }}">Мои товары</a>
+
+<script>
+// Переменная баланса
+let userBalance = parseFloat(document.getElementById('userBalance').innerText);
+
+// Открытие меню вывода
+function openBalanceMenu() { document.getElementById('balanceMenu').style.display='block'; }
+function closeBalanceMenu() { document.getElementById('balanceMenu').style.display='none'; }
+
+// Подтверждение вывода
+function confirmWithdraw() {
+    const amountStr = document.getElementById('withdrawAmount').value;
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount) || amount <= 0) { alert('Введите корректную сумму'); return; }
+    if (amount > userBalance) { alert('Недостаточно средств'); return; }
+    fetch('/api/update_balance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: amount })
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status==='ok') {
+            userBalance -= amount;
+            document.getElementById('userBalance').innerText = userBalance.toFixed(2);
+            document.getElementById('balanceAmount').innerText = userBalance.toFixed(2);
+            alert('Средства успешно выведены');
+        } else { alert('Ошибка: ' + data.message); }
+        closeBalanceMenu();
+      });
+}
+
+// Меню админа
+function openAdminMenu() {
+    document.getElementById('adminMenu').style.display='block';
+    document.getElementById('adminActions').style.display='none';
+    document.getElementById('adminPassword').value='';
+}
+function closeAdminMenu() { document.getElementById('adminMenu').style.display='none'; }
+function checkAdminPassword() {
+    const pw = document.getElementById('adminPassword').value;
+    if (pw==='37858582') {
+        document.getElementById('adminActions').style.display='block';
+    } else { alert('Неверный пароль'); }
+}
+function adminAddFunds() {
+    const amountStr = document.getElementById('adminAmount').value;
+    const accountId = document.getElementById('adminAccountId').value;
+    const amount = parseFloat(amountStr);
+    if (isNaN(amount) || amount<=0 || !accountId) { alert('Проверьте ввод'); return; }
+    fetch('/api/admin/add_funds', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({ account_id: accountId, amount: amount })
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status==='ok') { alert('Пополнено'); }
+        else { alert('Ошибка: '+data.message); }
+        closeAdminMenu();
+      });
+}
+
+// --- Заказы продавцов и пришедших товаров ---
+
+let myOrders = [];
+let incomingOrders = [];
+
+function showProducers() {
+    document.getElementById('producersSection').style.display='block';
+    document.getElementById('receivedSection').style.display='none';
+    loadMyOrders();
+}
+function showReceived() {
+    document.getElementById('producersSection').style.display='none';
+    document.getElementById('receivedSection').style.display='block';
+    loadIncomingOrders();
+}
+
+function loadMyOrders() {
+    fetch('/api/get_my_orders')
+        .then(res => res.json())
+        .then(data => {
+            myOrders = data.orders;
+            renderMyOrders();
+        });
+}
+function loadIncomingOrders() {
+    fetch('/api/get_incoming_orders')
+        .then(res => res.json())
+        .then(data => {
+            incomingOrders = data.orders;
+            renderIncomingOrders();
+        });
+}
+function renderMyOrders() {
+    const container = document.getElementById('producersOrders');
+    container.innerHTML = '';
+    if (myOrders.length===0) { container.innerHTML='<p>Нет заказов на продажу</p>'; return; }
+    myOrders.forEach(o => {
+        const div = document.createElement('div');
+        div.style.border='1px solid #555'; div.style.padding='10px'; div.style.marginBottom='10px';
+        div.innerHTML= `
+            <p><strong>Товар:</strong> ${o.productName}</p>
+            <p><strong>Цена:</strong> ${o.price} руб.</p>
+            <p><strong>Характеристики:</strong> ${o.characteristics}</p>
+            <button onclick="markDelivered(${o.id})">Заказ доставлен</button>
+        `;
+        container.appendChild(div);
+    });
+}
+function renderIncomingOrders() {
+    const container = document.getElementById('receivedOrders');
+    container.innerHTML = '';
+    if (incomingOrders.length===0) { container.innerHTML='<p>Нет пришедших товаров</p>'; return; }
+    incomingOrders.forEach(o => {
+        const div = document.createElement('div');
+        div.style.border='1px solid #555'; div.style.padding='10px'; div.style.marginBottom='10px';
+        div.innerHTML= `
+            <p><strong>От:</strong> ${o.sellerName}</p>
+            <p><strong>Товар:</strong> ${o.productName}</p>
+            <p><strong>Цена:</strong> ${o.price} руб.</p>
+            <button onclick="markReceived(${o.id})">Забрал</button>
+        `;
+        container.appendChild(div);
+    });
+}
+function markDelivered(orderId) {
+    fetch('/api/mark_delivered', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({order_id: orderId})
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status==='ok') { alert('Заказ доставлен'); loadMyOrders(); }
+        else { alert('Ошибка: '+data.message); }
+      });
+}
+function markReceived(orderId) {
+    fetch('/api/mark_received', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({order_id: orderId})
+    }).then(res => res.json())
+      .then(data => {
+        if (data.status==='ok') { alert('Товар забран'); loadIncomingOrders(); }
+        else { alert('Ошибка: '+data.message); }
+      });
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+<!-- edit_product.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Редактировать товар</title>
+<style>
+body { background-color: #121212; color: #eee; font-family: Arial, sans-serif; padding: 20px; }
+input, textarea { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #555; background-color: #222; color: #fff; }
+button { padding: 10px 20px; margin-top: 10px; border: none; border-radius: 5px; background-color: #2980b9; color: #fff; cursor: pointer; }
+button:hover { background-color: #3498db; }
+</style>
+</head>
+<body>
+<h2>Редактировать товар</h2>
+<form id="editForm">
+<label>Название:</label>
+<input type="text" id="name" /><br>
+<label>Описание:</label>
+<textarea id="description" rows="3"></textarea><br>
+<label>Цена:</label>
+<input type="number" id="price" step="0.01" /><br>
+<label>Сроки доставки:</label>
+<input type="text" id="delivery_time" /><br>
+<label>Количество:</label>
+<input type="number" id="stock" /><br>
+<button type="button" onclick="save()">Сохранить</button>
+<button type="button" onclick="deleteProduct()">Удалить</button>
+<button type="button" onclick="addToStock()">Добавить на склад</button>
+</form>
+
+<script>
+const productId = {{ product_id }}; // Передается из сервера
+// Предварительно нужно загрузить текущие данные товара
+fetch('/api/get_product/' + productId)
+.then(res => res.json())
+.then(data => {
+    document.getElementById('name').value = data.name;
+    document.getElementById('description').value = data.description;
+    document.getElementById('price').value = data.price;
+    document.getElementById('delivery_time').value = data.delivery_time;
+    document.getElementById('stock').value = data.stock;
+});
+
+function save() {
+    const data = {
+        name: document.getElementById('name').value.trim(),
+        description: document.getElementById('description').value.trim(),
+        price: parseFloat(document.getElementById('price').value),
+        delivery_time: document.getElementById('delivery_time').value.trim(),
+        stock: parseInt(document.getElementById('stock').value)
+    };
+    fetch('/api/update_product/' + productId, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+    }).then(res => res.json())
+    .then(resData => {
+        if (resData.status==='ok') {
+            alert('Товар обновлен');
+            window.location.href = '/'; // или куда нужно
+        } else {
+            alert('Ошибка: ' + resData.message);
+        }
+    });
+}
+
+function deleteProduct() {
+    if (!confirm('Вы уверены, что хотите удалить товар?')) return;
+    fetch('/api/delete_product/' + productId, {
+        method: 'POST'
+    }).then(res => res.json())
+    .then(resData => {
+        if (resData.status==='ok') {
+            alert('Товар удален');
+            window.location.href = '/';
+        } else {
+            alert('Ошибка: ' + resData.message);
+        }
+    });
+}
+
+function addToStock() {
+    const addAmount = parseInt(prompt('Введите количество для добавления на склад'));
+    if (isNaN(addAmount) || addAmount <= 0) { alert('Некорректное число'); return; }
+    fetch('/api/add_to_stock/' + productId, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({amount: addAmount})
+    }).then(res => res.json())
+    .then(resData => {
+        if (resData.status==='ok') {
+            alert('Количество увеличено');
+            window.location.reload();
+        } else {
+            alert('Ошибка: ' + resData.message);
+        }
+    });
+}
+</script>
+</body>
+</html>

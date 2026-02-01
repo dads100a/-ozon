@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Баланс</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>Баланс: {{ user[5] }} руб.</h2>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul>
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    <h3>Пополнение</h3>
+    <form method="post">
+        <input type="hidden" name="action" value="deposit">
+        <label>Сумма для пополнения:</label>
+        <input type="number" name="amount" min="0" step="0.01" required>
+        <button type="submit">Пополнить</button>
+    </form>
+<h3>Вывод средств</h3>
+<form method="post">
+    <input type="hidden" name="action" value="withdraw">
+    <label>Сумма для вывода:</label>
+    <input type="number" name="amount" min="0" step="0.01" required>
+    <br><br>
+    <label>ID банка:</label>
+    <input type="text" name="bank_id" required>
+    <br><br>
+    <button type="submit">Вывести</button>
+</form>

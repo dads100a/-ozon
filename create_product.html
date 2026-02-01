@@ -1,0 +1,128 @@
+<!-- templates/create_product.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Создать товар</title>
+<style>
+/* ваш стиль */
+body {
+  background-color: #121212;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+label {
+  font-weight: bold;
+}
+input[type="text"], input[type="number"], textarea, input[type="file"] {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #555;
+  background-color: #2c2c2c;
+  color: #fff;
+  font-size: 1em;
+}
+button {
+  padding: 12px;
+  background-color: #2980b9;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #3498db;
+}
+</style>
+</head>
+<body>
+
+<h2>Создать новый товар</h2>
+
+<form id="createProductForm" enctype="multipart/form-data" method="POST" action="/create_product">
+  <!-- скрытое поле для ID пользователя -->
+  <input type="hidden" id="user_id" name="user_id" value="{{ current_user_id }}">
+
+  <!-- Новое поле для ID привязки -->
+  <label for="category_id">ID категории или привязки</label>
+  <input type="text" id="category_id" name="category_id" required>
+
+  <label for="name">Название</label>
+  <input type="text" id="name" name="name" required>
+
+  <label for="description">Описание</label>
+  <textarea id="description" name="description" rows="4" required></textarea>
+
+  <label for="price">Цена</label>
+  <input type="number" id="price" name="price" min="0" step="0.01" required>
+
+  <label for="delivery_time">Сроки доставки</label>
+  <input type="text" id="delivery_time" name="delivery_time" required>
+
+  <label for="stock">Количество в наличии</label>
+  <input type="number" id="stock" name="stock" min="0" required>
+
+  <label for="main_image">Основное изображение</label>
+  <input type="file" id="main_image" name="main_image" accept="image/*" required>
+
+  <label for="additional_images">Дополнительные изображения</label>
+  <input type="file" id="additional_images" name="additional_images" accept="image/*" multiple>
+
+  <button type="submit">Создать товар</button>
+</form>
+
+<script>
+document.getElementById('createProductForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+
+  const formData = new FormData();
+
+  formData.append('name', document.getElementById('name').value.trim());
+  formData.append('description', document.getElementById('description').value.trim());
+  formData.append('price', parseFloat(document.getElementById('price').value));
+  formData.append('delivery_time', document.getElementById('delivery_time').value.trim());
+  formData.append('stock', parseInt(document.getElementById('stock').value));
+  formData.append('category_id', document.getElementById('category_id').value.trim()); // добавляем ID категории
+
+  const mainImageInput = document.getElementById('main_image');
+  if (mainImageInput.files.length > 0) {
+    formData.append('main_image', mainImageInput.files[0]);
+  }
+
+  const additionalImagesInput = document.getElementById('additional_images');
+  for (let i = 0; i < additionalImagesInput.files.length; i++) {
+    formData.append('additional_images', additionalImagesInput.files[i]);
+  }
+
+  // Передача user_id через скрытое поле
+  formData.append('user_id', document.getElementById('user_id').value);
+
+  fetch('/create_product', {
+    method: 'POST',
+    body: formData
+  })
+  .then(res => res.text())
+  .then(response => {
+    alert('Товар успешно создан!');
+    document.getElementById('createProductForm').reset();
+  })
+  .catch(e => alert('Ошибка при отправке: ' + e.message));
+});
+</script>
+
+</body>
+</html>

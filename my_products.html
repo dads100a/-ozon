@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Мои товары</title>
+<script>
+  // Функция для загрузки товаров продавца
+  function loadMyProducts() {
+    fetch('/api/get_my_products')
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById('myProductsList');
+        list.innerHTML = '';
+        if (data.products.length === 0) {
+          list.innerHTML = '<p>Нет выставленных товаров.</p>';
+          return;
+        }
+        data.products.forEach(p => {
+          const div = document.createElement('div');
+          div.style.border='1px solid #555'; 
+          div.style.padding='10px'; 
+          div.style.marginBottom='10px';
+          div.innerHTML= `
+            <h3>${p.name}</h3>
+            <img src="${p.image_url}" style="width:150px; height:auto;" />
+            <p>${p.description}</p>
+            <p>Цена: ${p.price} руб.</p>
+            <p>Остаток: ${p.stock} шт.</p>
+            <p>Сроки доставки: ${p.delivery_time}</p>
+          `;
+          list.appendChild(div);
+        });
+      });
+  }
+
+  // Загружаем товары при открытии страницы
+  window.onload = loadMyProducts;
+</script>
+</head>
+<body>
+<h1>Мои товары</h1>
+<a href="main.html">Назад к меню</a>
+<div id="myProductsList"></div>
+</body>
+</html>

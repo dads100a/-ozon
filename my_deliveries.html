@@ -1,0 +1,54 @@
+<h2>Мои доставки</h2>
+<div id="delivery-messages"></div>
+
+<script>
+function loadDeliveries() {
+    fetch('/api/get_my_deliveries')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('delivery-messages');
+            container.innerHTML = '';
+            data.orders.forEach(order => {
+                if(order.status === 'Доставлен') {
+                    const div = document.createElement('div');
+                    div.innerHTML = `
+                        <p>Товар: ${order.product}</p>
+                        <p>Количество: ${order.quantity}</p>
+                        <p>Сообщение: ${order.notification_message || 'Нет сообщений'}</p>
+                        <button onclick="deleteOrder(${order.id})">Удалить товар</button>
+                        <hr>
+                    `;
+                    container.appendChild(div);
+                }
+            });
+        });
+}
+
+// Функция для удаления "товара" (заказа)
+function deleteOrder(orderId) {
+    fetch(`/api/delete_order/${orderId}`, { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'ok') {
+                alert('Товар удален');
+                loadDeliveries(); // обновляем список
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        });
+}
+
+let selectedStar = 0;
+
+document.querySelectorAll('.star-select').forEach(star => {
+  star.addEventListener('click', () => {
+    selectedStar = parseInt(star.dataset.star);
+    updateStars();
+  });
+});
+
+
+
+// Загружаем уведомления при открытии
+loadDeliveries();
+</script>

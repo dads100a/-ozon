@@ -1,0 +1,31 @@
+<!-- templates/login.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Вход</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Вход</h2>
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for msg in messages %}
+              <li>{{ msg }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form method="post">
+            <label>Айди или Имя:</label><br>
+            <input type="text" name="login" required><br>
+            <label>Пароль:</label><br>
+            <input type="password" name="password" required><br><br>
+            <button type="submit">Войти</button>
+        </form>
+        <a href="{{ url_for('index') }}">Назад</a>
+    </div>
+</body>
+</html>

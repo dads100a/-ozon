@@ -1,0 +1,58 @@
+<div id="seller-orders"></div>
+
+<script>
+function loadSellerOrders() {
+    fetch('/api/get_sales_orders')
+        .then(response => response.json())
+        .then(data => {
+            const container = document.getElementById('seller-orders');
+            container.innerHTML = '';
+            if(data.orders.length === 0) {
+                container.innerHTML = '<p>Нет заказов</p>';
+                return;
+            }
+            data.orders.forEach(order => {
+                const orderDiv = document.createElement('div');
+                orderDiv.className = 'order';
+                orderDiv.setAttribute('data-order-id', order.id);
+                orderDiv.innerHTML = `
+                    <p><strong>Заказ ID:</strong> ${order.id}</p>
+                    <p><strong>Покупатель:</strong> ${order.buyer_id}</p>
+                    <p><strong>Товар:</strong> ${order.productName}</p>
+                    <p><strong>Количество:</strong> ${order.quantity}</p>
+                    <p><strong>Стоимость:</strong> ${order.price} руб.</p>
+                    <p><strong>Статус:</strong> ${order.status}</p>
+                    <button onclick="markAsDelivered(${order.id})">ОК</button>
+                    <hr>
+                `;
+                container.appendChild(orderDiv);
+            });
+        });
+}
+
+function markAsDelivered(orderId) {
+    fetch(`/api/complete_order/${orderId}`, {method: 'POST'})
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'ok') {
+                alert('Заказ завершен');
+                // После успешного завершения заказа удаляем его из списка
+                deleteOrderFromList(orderId);
+                // Обновляем список заказов
+                loadSellerOrders();
+            } else {
+                alert('Ошибка: ' + data.message);
+            }
+        });
+}
+
+function deleteOrderFromList(orderId) {
+    const orderDiv = document.querySelector(`.order[data-order-id="${orderId}"]`);
+    if(orderDiv) {
+        orderDiv.remove();
+    }
+}
+
+// Загружаем заказы при открытии страницы
+loadSellerOrders();
+</script>

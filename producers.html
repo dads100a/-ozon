@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<title>Ваши заказы на продажу</title>
+<style>
+body {
+    background-color: #121212;
+    color: #eee;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+h2 {
+    text-align: center;
+}
+.order {
+    border: 1px solid #555;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+</style>
+</head>
+<body>
+<h2>Ваши заказы на продажу</h2>
+<div id="ordersContainer">Загрузка...</div>
+
+<script>
+function loadMyOrders() {
+    fetch('/api/get_my_orders')
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById('ordersContainer');
+            container.innerHTML = '';
+            if (data.orders.length === 0) {
+                container.innerHTML = '<p>Нет заказов на продажу</p>';
+                return;
+            }
+            data.orders.forEach(order => {
+                const div = document.createElement('div');
+                div.className = 'order';
+                div.innerHTML = `
+                    <p><strong>Товар:</strong> ${order.productName}</p>
+                    <p><strong>Цена:</strong> ${order.price} руб.</p>
+                    <p><strong>Статус:</strong> ${order.status}</p>
+                    <p><strong>Характеристики:</strong> ${order.characteristics}</p>
+                `;
+                container.appendChild(div);
+            });
+        });
+}
+loadMyOrders();
+</script>
+</body>
+</html>
